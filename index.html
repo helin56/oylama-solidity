@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hesap Makinası front-end</title>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="web3.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <script language="javascript" type="text/javascript" src="abi.js"></script>
+</head>
+  <body>
+
+    <script>
+        var ContractAddress = "0xfA746DB8264eb2f2B7573b09bD7Fe84847B23a3F";
+        var contract;
+
+        async function loadWeb3(){
+            if(window.ethereum){
+                window.web3 = new Web3(window.ethereum);
+                window.ethereum.enable();
+            }
+        }
+
+        async function loadContract(){
+            return await new window.web3.eth.Contract(ContractAbi, ContractAddress);
+        }
+
+        async function getCurrentAccount(accountindex=0){
+
+            var accounts = await ethereum.request({method: "eth_requestAccounts"});
+            /*
+            var accounts1 = await window.web3.eth.getAccounts();
+            document.getElementById("account_number").text = accounts1[0];
+            */
+           console.log(accounts)
+            return accounts[accountindex];
+        }
+
+
+        async function load() {
+            await loadWeb3();
+            window.contract = await loadContract();
+
+        }
+
+        async function cuzdan_bilgisi_getir(){
+            document.getElementById("cuzdan_no").value= await getCurrentAccount();
+            
+        }
+
+        async function aday_ekle(){
+            var respond = await contract.methods.aday_ekle(document.getElementById("aday_adi").value).send({ from: await getCurrentAccount() })
+            if(respond["blockHash"]){
+                alert("aday ismi eklendi");
+            } else {
+                alert("hata oluştu");
+            }
+            console.log(respond);
+        }
+
+        async function aday_listesi_getir(){
+            await contract.methods.adayisimleri().call({from : await getCurrentAccount});
+            
+        }
+        
+        async function aday_listesi(){
+            window.contract.methods.adayisimleri().call({
+                from: await getCurrentAccount()  
+            });
+            /*
+            .then( respond => {
+                console.log(respond);
+                var yazi = '';
+                var x = 0;
+                for (const element of respond) {
+                        // ...use `element`...
+                        
+                        yazi += '<input type="button" value="'+element+'" onclick="oy_ver('+x+');">  ';
+                        x++;
+                    }
+                    document.getElementById("aday_listesi1").innerHTML = yazi;
+            })
+            */
+
+        }
+
+        /*
+        async function oy_ver(aday_no){
+            var respond = await window.contract.methods.oy_kullan(aday_no).send({
+                from: await getCurrentAccount()
+            });
+            if(respond["blockHash"]){
+                alert("işlem tamam");
+            }
+            console(respond);
+        }
+*/
+
+
+
+
+        
+    </script>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <input type="button" class="btn btn-success" value="cüzdan numarası getir" onclick="cuzdan_bilgisi_getir();">
+                
+            </div>
+            <div class="col">
+                <p><input type="text" id="cuzdan_no" disabled></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <input type="text" id="aday_adi" class="">
+            </div>
+            <div class="col">
+                <input type="button" class="btn btn-danger" value="aday ekle" onclick="aday_ekle();">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col col-2">
+                <input type="button" class="btn btn-warning" value="adaylar getir" onclick="aday_listesi();">
+                <input type="button" class="btn" value="adaylar getir" onclick="aday_listesi_getir();">
+            </div>
+            <div class="col" id="aday_listesi1">
+                
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+       
+    
+
+
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  </body>
+</html>
